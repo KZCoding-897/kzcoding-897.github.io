@@ -2,17 +2,39 @@
     box-sizing: border-box;
 }
 
+@keyframes pressKey {
+    0% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    50% {
+        transform: translateY(4px) scale(0.98);
+        box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+}
+
 body {
     background-color: #143F6B;
     margin: 0;
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 20px;
 }
 
 .piano{
     display: flex;
+}
+
+.piano-higher {
+    display: flex;
+    gap: 5px;
 }
 
 .key{
@@ -22,6 +44,27 @@ body {
     align-items: flex-end;
     justify-content: center;
     position: relative;
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+}
+
+.key.higher {
+    height: calc(var(--width)*2);
+    width: 55px;
+    background-color: #FFD700;
+    border: 2px solid #666;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.key.higher.active {
+    animation: pressKey 0.3s ease-out;
+    background-color: #FFC700;
+}
+
+.key.higher .note-label {
+    color: #333;
+    font-size: 10px;
 }
 
 .note-label {
@@ -43,6 +86,7 @@ body {
 }
 
 .white.active {
+    animation: pressKey 0.15s ease-out;
     background-color: #CCC;
 }
 
@@ -59,9 +103,79 @@ body {
 }
 
 .black.active {
+    animation: pressKey 0.15s ease-out;
     background-color: #333;
 }
 
 .black.active {
     background-color: #333;
+}
+
+/* Estilo de la notificación */
+.notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #d4af37; /* Dorado Zelda */
+    padding: 30px 50px;
+    border-radius: 15px;
+    text-align: center;
+    color: #d4af37;
+    box-shadow: 0 0 20px #d4af37, inset 0 0 20px rgba(212, 175, 55, 0.2);
+    z-index: 100;
+    pointer-events: none; /* Para que puedas seguir clicando abajo */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.song-title {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.song-name {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-family: 'Times New Roman', serif; /* Fuente clásica */
+}
+
+/* Animación de entrada */
+@keyframes popIn {
+    0% { transform: translate(-50%, -40%) scale(0.8); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* ... tus estilos de .notification anteriores ... */
+
+/* NUEVO: Estilo para el icono */
+.song-icon {
+    width: 80px;   /* Tamaño del icono */
+    height: 80px;
+    object-fit: contain; /* Asegura que la imagen no se deforme */
+    margin-bottom: 15px; /* Espacio debajo del icono */
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.8)); /* Brillo dorado */
+    animation: float 3s ease-in-out infinite; /* Pequeña animación de flotar */
+}
+
+/* Animación opcional de flotación suave */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Ajuste opcional: reducir un poco el título "¡Melodía Correcta!" */
+.song-title {
+    font-size: 1rem; 
+    /* ... resto de estilos ... */
 }
