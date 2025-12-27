@@ -199,14 +199,100 @@ body {
 /* =========================================
    BLOQUEO VERTICAL
    ========================================= */
-@media (max-width: 950px) and (orientation: portrait) {
-    .piano-chassis, .notification { display: none !important; } /* Ocultar el nuevo chasis */
-    #rotate-message {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: var(--zelda-gold); font-family: 'Times New Roman', serif; text-align: center;
-        background: transparent;
+@media (max-width: 1000px) and (orientation: landscape) {
+    
+    body { 
+        padding: 0; 
+        background: #111; /* Fondo negro simple para evitar distracciones en bordes */
     }
-    .rotate-icon { font-size: 60px; margin-bottom: 30px; animation: rot 3s infinite linear; text-shadow: 0 0 20px var(--zelda-gold); }
-    #rotate-message p { font-size: 1.5rem; letter-spacing: 2px; }
-    @keyframes rot { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+
+    /* 1. AJUSTE DEL CHASIS (MUEBLE) */
+    .piano-chassis {
+        width: 100vw;       /* Ancho total */
+        height: 100vh;      /* Altura total */
+        border: none;       /* Quitamos bordes externos para ganar espacio */
+        border-radius: 0;
+        padding: 5px;       /* Mínimo padding */
+        justify-content: space-between; 
+        box-shadow: none;
+        background: #2b1d12; /* Madera oscura plana */
+    }
+    
+    /* Hacemos el encabezado más compacto */
+    .chassis-header { 
+        font-size: 0.8rem; 
+        margin: 0; 
+        padding: 2px 0;
+        height: 8vh; /* Ocupa poco espacio arriba */
+    }
+    .chassis-separator { display: none; } /* Ocultamos el separador para ganar espacio */
+
+    /* 2. TECLADO SUPERIOR (AZULES - AGUDOS) */
+    .piano-higher {
+        height: 42vh; /* 42% de la pantalla */
+        gap: 4px;
+        margin-bottom: 5px;
+    }
+    
+    .key.higher {
+        border-radius: 8px;
+        border: 2px solid #d4af37;
+        /* Quitamos gradientes complejos para mejorar rendimiento y legibilidad */
+        background: #1a2a3a; 
+        box-shadow: inset 0 0 10px #000;
+    }
+
+    /* TEXTO GIGANTE Y LEGIBLE (AGUDOS) */
+    .key.higher .note-label {
+        font-size: 1.2rem !important; /* Letra mucho más grande */
+        color: white !important;
+        text-shadow: 2px 2px 0 #000; /* Borde negro fuerte */
+        margin-bottom: auto; /* Centrar verticalmente */
+        margin-top: auto;
+    }
+
+    /* 3. TECLADO INFERIOR (PIANO - GRAVES) */
+    .piano {
+        height: 48vh; /* 48% de la pantalla */
+        padding: 0;
+        background: transparent; 
+        border: none; 
+        box-shadow: none;
+        align-items: flex-start; /* Alinear arriba para controlar mejor */
+    }
+
+    /* Teclas Blancas */
+    .white {
+        border-radius: 0 0 8px 8px;
+        background: #e8e0c8; /* Color plano más claro para contraste */
+        box-shadow: inset 0 -5px 0 rgba(0,0,0,0.3);
+        height: 100%;
+    }
+    
+    /* TEXTO GIGANTE Y LEGIBLE (BLANCAS) */
+    .white .note-label {
+        font-size: 1rem !important;
+        color: #333 !important; /* Texto oscuro fuerte */
+        font-weight: 900;
+        margin-bottom: 10px;
+    }
+
+    /* Teclas Negras */
+    .black {
+        width: 8vw; /* Más anchas para poder tocarlas bien */
+        height: 60%; /* 60% de la altura de la blanca */
+        margin-left: -4vw; 
+        margin-right: -4vw;
+        background: linear-gradient(to bottom, #444, #000);
+        box-shadow: 2px 2px 5px #000;
+        z-index: 50;
+    }
+
+    /* TEXTO GIGANTE Y LEGIBLE (NEGRAS) */
+    .black .note-label {
+        font-size: 0.9rem !important;
+        color: white !important;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
 }
