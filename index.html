@@ -3,13 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi primera escena con Three.js</title>
-    <style>
-        body { margin: 0; }
-        canvas { display: block; }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="script.js" defer></script>
+    <title>Piano</title>
+
 </head>
 <body>
-    <script type="module" src="main.js"></script>
+    <div class="piano">
+        <div data-note="C4" class="key white"></div>
+        <div data-note="Db4" class="key black"></div>
+        <div data-note="D4" class="key white"></div>
+        <div data-note="Eb4" class="key black"></div>
+        <div data-note="E4" class="key white"></div>
+        <div data-note="F4" class="key white"></div>
+        <div data-note="Gb4" class="key black"></div>
+        <div data-note="G4" class="key white"></div>
+        <div data-note="Ab4" class="key black"></div>
+        <div data-note="A4" class="key white"></div>
+        <div data-note="Bb4" class="key black"></div>
+        <div data-note="B4" class="key white"></div>
+    </div>
+
 </body>
 </html>
