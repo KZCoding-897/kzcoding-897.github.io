@@ -234,7 +234,7 @@ body {
     /* 2. TECLADO SUPERIOR (AZULES - AGUDOS) */
     /* REDUCIDO: Ahora son más bajitos para dejar ver el piano */
     .piano-higher {
-        height: 32vh; /* Bajamos de 42% a 32% */
+        height: 20vh; /* Bajamos de 42% a 32% */
         gap: 3px;
         margin-bottom: 2px;
     }
@@ -256,7 +256,7 @@ body {
     /* 3. TECLADO INFERIOR (PIANO - GRAVES) */
     /* AUMENTADO: Ahora tiene espacio para verse completo */
     .piano {
-        height: 58vh; /* Ocupa el 58% restante (6+32+58 = 96%) */
+        height: 70vh; /* Ocupa el 58% restante (6+32+58 = 96%) */
         padding: 0;
         background: transparent; 
         border: none; 
@@ -297,4 +297,5 @@ body {
         margin-bottom: 4px;
     }
 }
+
 
