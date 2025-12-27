@@ -179,3 +179,37 @@ body {
     font-size: 1rem; 
     /* ... resto de estilos ... */
 }
+
+/* Responsive: mobile adjustments */
+@media (max-width: 800px) {
+    :root { }
+    body { gap: 12px; }
+    .piano { overflow-x: auto; padding: 8px; -webkit-overflow-scrolling: touch; }
+    .piano-higher { justify-content: center; }
+    
+    /* Reduce main key width for phones */
+    .white { --width: 72px; }
+    .black { --width: 42px; }
+
+    .key { height: calc(var(--width) * 3.6); }
+
+    /* make higher keys smaller and touch-friendly */
+    .key.higher { width: 44px; height: calc(var(--width) * 1.5); }
+    .key.higher .note-label { font-size: 9px; }
+
+    .note-label { font-size: 11px; margin-bottom: 8px; }
+}
+
+@media (max-width: 420px) {
+    /* Very small phones */
+    .white { --width: 56px; }
+    .black { --width: 34px; }
+    .key { height: calc(var(--width) * 3.4); }
+    .key.higher { width: 36px; height: calc(var(--width) * 1.4); }
+    .note-label { font-size: 10px; margin-bottom: 6px; }
+}
+
+/* Improve tap target spacing on touch devices */
+@media (pointer: coarse) {
+    .key, .key.higher { touch-action: manipulation; }
+}

@@ -266,3 +266,128 @@ function showNotification(name, iconUrl) {
         setTimeout(() => { songIconImg.src = ''; }, 500); 
     }, 4000);
 }
+
+/* =========================================
+   4. HERRAMIENTA DE PRUEBA: OVERLAY DE HIT AREAS
+   - Muestra rectángulos sobre cada tecla con sus dimensiones
+   - Registra toques/clicks y resalta la tecla detectada
+   - Activar/desactivar con un botón flotante
+   ========================================= */
+
+// Crear controles de prueba en la página
+function createTestControls() {
+    // Botón flotante
+    const btn = document.createElement('button');
+    btn.id = 'test-toggle-btn';
+    btn.innerText = 'Test Touch';
+    Object.assign(btn.style, {
+        position: 'fixed',
+        right: '12px',
+        bottom: '12px',
+        zIndex: 9999,
+        padding: '8px 10px',
+        borderRadius: '8px',
+        background: '#222',
+        color: '#fff',
+        border: '1px solid rgba(255,255,255,0.12)',
+        fontSize: '14px',
+        cursor: 'pointer'
+    });
+    document.body.appendChild(btn);
+
+    let overlayVisible = false;
+    let overlay;
+
+    btn.addEventListener('click', () => {
+        overlayVisible = !overlayVisible;
+        if (overlayVisible) {
+            overlay = buildOverlay();
+            document.body.appendChild(overlay);
+            btn.innerText = 'Hide Test';
+        } else {
+            if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            btn.innerText = 'Test Touch';
+        }
+    });
+}
+
+// Construye el overlay con rectángulos para cada tecla
+function buildOverlay() {
+    const ov = document.createElement('div');
+    ov.id = 'touch-overlay';
+    Object.assign(ov.style, {
+        position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
+        pointerEvents: 'none', zIndex: 9998
+    });
+
+    // Para cada tecla, dibujar un rectángulo con medidas
+    document.querySelectorAll('.key').forEach((key, i) => {
+        const r = key.getBoundingClientRect();
+        const box = document.createElement('div');
+        box.className = 'overlay-box';
+        Object.assign(box.style, {
+            position: 'absolute',
+            left: `${r.left + window.scrollX}px`,
+            top: `${r.top + window.scrollY}px`,
+            width: `${r.width}px`,
+            height: `${r.height}px`,
+            border: '2px dashed rgba(255,255,255,0.6)',
+            background: 'rgba(255,255,255,0.02)',
+            color: '#fff',
+            fontSize: '11px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            paddingTop: '6px',
+            boxSizing: 'border-box'
+        });
+
+        const label = document.createElement('div');
+        label.innerText = `${key.dataset.note} (${Math.round(r.width)}x${Math.round(r.height)})`;
+        box.appendChild(label);
+
+        ov.appendChild(box);
+    });
+
+    // Mostrar el overlay y permitir detección de toques
+    ov.style.pointerEvents = 'auto';
+
+    // Cuando el usuario toca/clica, detectamos la tecla real debajo
+    function handlePointer(e) {
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
+        const el = document.elementFromPoint(x, y);
+        if (!el) return;
+        const keyEl = el.closest('.key');
+        // Flash en overlay
+        ov.querySelectorAll('.overlay-box').forEach(box => box.style.borderColor = 'rgba(255,255,255,0.6)');
+        if (keyEl) {
+            // encontrar la caja correspondiente por data-note
+            const note = keyEl.dataset.note;
+            const box = Array.from(ov.children).find(b => b.textContent.startsWith(note));
+            if (box) {
+                box.style.borderColor = '#00FF66';
+                box.style.background = 'rgba(0,255,102,0.06)';
+                setTimeout(() => {
+                    box.style.borderColor = 'rgba(255,255,255,0.6)';
+                    box.style.background = 'rgba(255,255,255,0.02)';
+                }, 300);
+            }
+            console.log('Touch detected on note:', note, 'at', Math.round(x), Math.round(y));
+        } else {
+            console.log('Touch at', Math.round(x), Math.round(y), 'did not hit a .key element');
+        }
+    }
+
+    ov.addEventListener('click', handlePointer);
+    ov.addEventListener('touchstart', handlePointer);
+
+    return ov;
+}
+
+// Crear los controles de test al cargar el script
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        createTestControls();
+    }, 200);
+});
