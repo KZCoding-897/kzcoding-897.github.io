@@ -266,3 +266,24 @@ function showNotification(name, iconUrl) {
         setTimeout(() => { songIconImg.src = ''; }, 500); 
     }, 4000);
 }
+
+/* =========================================
+   SOPORTE TÁCTIL (MÓVIL)
+   ========================================= */
+
+const allKeys = document.querySelectorAll('.key');
+
+allKeys.forEach(key => {
+    // Evento cuando el dedo toca la pantalla
+    key.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Evita scroll o zoom o menú contextual
+        playNote(key);
+    });
+
+    // Opcional: Si quieres que deje de brillar al soltar
+    key.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        // La clase 'active' ya se quita sola en playNote con el setTimeout, 
+        // pero esto asegura limpieza si cambias la lógica.
+    });
+});
