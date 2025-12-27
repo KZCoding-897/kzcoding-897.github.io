@@ -197,102 +197,104 @@ body {
 }
 
 /* =========================================
-   BLOQUEO VERTICAL
+   BLOQUEO HORIZONTAL
    ========================================= */
 @media (max-width: 1000px) and (orientation: landscape) {
     
     body { 
         padding: 0; 
-        background: #111; /* Fondo negro simple para evitar distracciones en bordes */
+        background: #111; 
+        /* Forzamos que nada exceda el alto de la pantalla */
+        max-height: 100vh;
     }
 
     /* 1. AJUSTE DEL CHASIS (MUEBLE) */
     .piano-chassis {
-        width: 100vw;       /* Ancho total */
-        height: 100vh;      /* Altura total */
-        border: none;       /* Quitamos bordes externos para ganar espacio */
+        width: 100vw;
+        height: 100vh;      
+        border: none;
         border-radius: 0;
-        padding: 5px;       /* Mínimo padding */
-        justify-content: space-between; 
+        padding: 2px 5px;   /* Padding mínimo vertical */
+        justify-content: flex-start; /* Alineamos todo arriba */
         box-shadow: none;
-        background: #2b1d12; /* Madera oscura plana */
+        background: #2b1d12;
+        gap: 2px; /* Espacio mínimo entre filas */
     }
     
-    /* Hacemos el encabezado más compacto */
+    /* Encabezado ultra-delgado */
     .chassis-header { 
-        font-size: 0.8rem; 
+        font-size: 0.7rem; 
         margin: 0; 
-        padding: 2px 0;
-        height: 8vh; /* Ocupa poco espacio arriba */
+        height: 6vh; /* Solo ocupa el 6% de la pantalla */
+        display: flex;
+        align-items: center;
     }
-    .chassis-separator { display: none; } /* Ocultamos el separador para ganar espacio */
+    .chassis-separator { display: none; }
 
     /* 2. TECLADO SUPERIOR (AZULES - AGUDOS) */
+    /* REDUCIDO: Ahora son más bajitos para dejar ver el piano */
     .piano-higher {
-        height: 42vh; /* 42% de la pantalla */
-        gap: 4px;
-        margin-bottom: 5px;
+        height: 32vh; /* Bajamos de 42% a 32% */
+        gap: 3px;
+        margin-bottom: 2px;
     }
     
     .key.higher {
-        border-radius: 8px;
+        border-radius: 6px;
         border: 2px solid #d4af37;
-        /* Quitamos gradientes complejos para mejorar rendimiento y legibilidad */
         background: #1a2a3a; 
-        box-shadow: inset 0 0 10px #000;
+        box-shadow: inset 0 0 5px #000;
     }
 
-    /* TEXTO GIGANTE Y LEGIBLE (AGUDOS) */
     .key.higher .note-label {
-        font-size: 1.2rem !important; /* Letra mucho más grande */
+        font-size: 1rem !important; /* Un poco más chico para que quepa */
         color: white !important;
-        text-shadow: 2px 2px 0 #000; /* Borde negro fuerte */
-        margin-bottom: auto; /* Centrar verticalmente */
-        margin-top: auto;
+        text-shadow: 2px 2px 0 #000;
+        margin: auto;
     }
 
     /* 3. TECLADO INFERIOR (PIANO - GRAVES) */
+    /* AUMENTADO: Ahora tiene espacio para verse completo */
     .piano {
-        height: 48vh; /* 48% de la pantalla */
+        height: 58vh; /* Ocupa el 58% restante (6+32+58 = 96%) */
         padding: 0;
         background: transparent; 
         border: none; 
         box-shadow: none;
-        align-items: flex-start; /* Alinear arriba para controlar mejor */
+        align-items: flex-start;
     }
 
     /* Teclas Blancas */
     .white {
-        border-radius: 0 0 8px 8px;
-        background: #e8e0c8; /* Color plano más claro para contraste */
-        box-shadow: inset 0 -5px 0 rgba(0,0,0,0.3);
-        height: 100%;
+        border-radius: 0 0 6px 6px;
+        background: #e8e0c8;
+        box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
+        height: 100%; /* Llenan todo el espacio asignado */
     }
     
-    /* TEXTO GIGANTE Y LEGIBLE (BLANCAS) */
     .white .note-label {
-        font-size: 1rem !important;
-        color: #333 !important; /* Texto oscuro fuerte */
+        font-size: 0.9rem !important;
+        color: #333 !important;
         font-weight: 900;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     /* Teclas Negras */
     .black {
-        width: 8vw; /* Más anchas para poder tocarlas bien */
-        height: 60%; /* 60% de la altura de la blanca */
+        width: 8vw;
+        height: 55%; /* Un poco más cortas para no estorbar tanto */
         margin-left: -4vw; 
         margin-right: -4vw;
         background: linear-gradient(to bottom, #444, #000);
-        box-shadow: 2px 2px 5px #000;
+        box-shadow: 2px 2px 4px #000;
         z-index: 50;
     }
 
-    /* TEXTO GIGANTE Y LEGIBLE (NEGRAS) */
     .black .note-label {
-        font-size: 0.9rem !important;
+        font-size: 0.8rem !important;
         color: white !important;
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
     }
 }
+
