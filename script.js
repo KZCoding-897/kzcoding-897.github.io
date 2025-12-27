@@ -1,132 +1,136 @@
 /* =========================================
-   CONFIGURACIÓN Y MAPEO
+   1. CONFIGURACIÓN Y MAPEO DE TECLAS
    ========================================= */
+
+// Teclas del teclado de la computadora
 const WHITE_KEYS = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
 const BLACK_KEYS = ['s', 'd', 'g', 'h', 'j'];
 
-// Mapeo de semitonos relativos a Do Central (C4 = 0)
-// Esto es vital para calcular la afinación exacta
-const noteSemitones = {
-    'C4': 0, 'Db4': 1, 'D4': 2, 'Eb4': 3, 'E4': 4,
-    'F4': 5, 'Gb4': 6, 'G4': 7, 'Ab4': 8, 'A4': 9,
-    'Bb4': 10, 'B4': 11
-};
+// Lista de nombres de archivos que vamos a cargar
+// Deben coincidir con el atributo data-note en tu HTML
+const NOTE_NAMES = [
+    'C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 
+    'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4'
+];
 
-// Selección de elementos del DOM (Tu HTML existente)
+// Selección de elementos del HTML
 const keys = document.querySelectorAll('.key');
 const whiteKeys = document.querySelectorAll('.key.white');
 const blackKeys = document.querySelectorAll('.key.black');
 
-// Variables globales de audio
+// Variables del sistema de audio
 let audioContext;
-let pianoBuffer = null;
+const audioBuffers = {}; // Aquí se guardarán los sonidos cargados
 
 /* =========================================
-   MOTOR DE AUDIO (SAMPLER)
+   2. MOTOR DE AUDIO (CARGA Y REPRODUCCIÓN)
    ========================================= */
 
-// 1. Inicializar el contexto y descargar el sonido
+// Función para iniciar el contexto y cargar los archivos
 async function initAudio() {
     if (audioContext) return;
 
-    // Crear contexto de audio compatible con todos los navegadores
+    // Crear el contexto de audio (Soporte para Chrome, Firefox, Safari)
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     audioContext = new AudioContext();
 
-    try {
-        // Cargamos una grabación real de un Piano (Nota C4)
-        // Nota: Si usas esto en local sin servidor, puede dar error de CORS. 
-        // Usa Live Server o sube el archivo mp3 a tu carpeta local.
-        const response = await fetch('https://raw.githubusercontent.com/pffy/mp3-piano-sound/master/mp3/c4.mp3');
-        const arrayBuffer = await response.arrayBuffer();
-        
-        // Decodificamos el audio para usarlo
-        pianoBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        console.log("Sonido de piano cargado correctamente");
-        
-    } catch (error) {
-        console.error("Error cargando el sonido:", error);
-        alert("Para que el sonido funcione, necesitas ejecutar este archivo en un servidor local (por políticas de seguridad del navegador).");
-    }
+    console.log("Iniciando carga de sonidos...");
+
+    // Recorremos la lista de notas y creamos una promesa de carga para cada una
+    const loadPromises = NOTE_NAMES.map(async (note) => {
+        try {
+            // Buscamos el archivo en la carpeta local (ej: ./C4.mp3)
+            // AHORA (Busca dentro de la carpeta "notes")
+            const response = await fetch(`./notes/${note}.mp3`);
+            
+            if (!response.ok) {
+                throw new Error(`No se encontró el archivo: ${note}.mp3`);
+            }
+
+            const arrayBuffer = await response.arrayBuffer();
+            
+            // Decodificamos el audio (convertir mp3 a datos de audio crudos)
+            const decodedAudio = await audioContext.decodeAudioData(arrayBuffer);
+            
+            // Guardamos el sonido en nuestro diccionario usando el nombre de la nota
+            audioBuffers[note] = decodedAudio;
+            
+        } catch (error) {
+            console.error(`Error cargando la nota ${note}:`, error);
+        }
+    });
+
+    // Esperamos a que TODOS los archivos se terminen de cargar
+    await Promise.all(loadPromises);
+    console.log("¡Piano listo! Todos los sonidos cargados.");
 }
 
-// 2. Función para reproducir la nota
+// Función para reproducir una nota específica
 function playNote(key) {
-    // Si no se ha iniciado el audio, iniciarlo (requerido por navegadores)
+    // Si el contexto no existe (primera vez), intentamos iniciarlo
     if (!audioContext) initAudio();
-    
-    // Si el buffer aún no descargó, no hacer nada
-    if (!pianoBuffer) return;
+
+    // Si el navegador suspendió el audio (común en Chrome), lo reanudamos
+    if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
 
     const note = key.dataset.note;
-    const semitones = noteSemitones[note];
+    const buffer = audioBuffers[note];
 
-    // Si la nota no está en nuestro mapa, salir
-    if (semitones === undefined) return;
+    // Si el archivo de audio para esta nota no se cargó, no hacemos nada
+    if (!buffer) return;
 
-    // --- CADENA DE AUDIO ---
-    
-    // A. Fuente de sonido (Sampler)
+    // Creamos una fuente de sonido
     const source = audioContext.createBufferSource();
-    source.buffer = pianoBuffer;
+    source.buffer = buffer;
 
-    // B. Matemáticas de afinación (Pitch Shifting)
-    // Fórmula: 2 elevado a (semitonos / 12)
-    // Esto estira o encoge el audio para dar la nota correcta
-    source.playbackRate.value = Math.pow(2, semitones / 12);
+    // Conectamos la fuente a los altavoces (destination)
+    source.connect(audioContext.destination);
 
-    // C. Control de Volumen y Envolvente (Gain)
-    const gainNode = audioContext.createGain();
-    
-    // Conexiones: Fuente -> Volumen -> Altavoces
-    source.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    // D. Envolvente (ADSR simplificado)
-    const now = audioContext.currentTime;
-    // Volumen inicial (evita distorsión si se tocan muchas teclas)
-    gainNode.gain.setValueAtTime(0.8, now); 
-    // Decaimiento natural (como un piano real que se apaga lentamente)
-    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 2.5);
-
-    // Reproducir
+    // Reproducimos el sonido ahora mismo (tiempo 0)
     source.start(0);
-    
-    // Añadir clase visual para CSS
+
+    // --- EFECTOS VISUALES ---
     key.classList.add('active');
-    // Quitar clase visual después de un momento
-    setTimeout(() => key.classList.remove('active'), 200);
+    // Quitamos la clase 'active' después de 150ms para que la tecla "suba"
+    setTimeout(() => {
+        key.classList.remove('active');
+    }, 150);
 }
 
 /* =========================================
-   EVENT LISTENERS (INTERACCIÓN)
+   3. MANEJO DE EVENTOS (MOUSE Y TECLADO)
    ========================================= */
 
-// Eventos de Mouse / Click
+// Evento: Clic del mouse en las teclas
 keys.forEach(key => {
     key.addEventListener('mousedown', () => playNote(key));
 });
 
-// Eventos de Teclado
+// Evento: Presionar teclas del teclado de la computadora
 document.addEventListener('keydown', e => {
-    // Evitar que si dejas la tecla pegada se dispare mil veces
+    // Evitar que el sonido se repita como metralleta si dejas la tecla presionada
     if (e.repeat) return;
     
     const keyChar = e.key.toLowerCase();
     const whiteIndex = WHITE_KEYS.indexOf(keyChar);
     const blackIndex = BLACK_KEYS.indexOf(keyChar);
 
+    // Si la tecla presionada está en nuestra lista de blancas, tocarla
     if (whiteIndex > -1) {
         playNote(whiteKeys[whiteIndex]);
     }
     
+    // Si la tecla presionada está en nuestra lista de negras, tocarla
     if (blackIndex > -1) {
         playNote(blackKeys[blackIndex]);
     }
 });
 
-// Inicialización "lazy" (al primer clic en la página)
-// Los navegadores modernos bloquean el audio si no hay interacción del usuario primero.
+// Inicialización Lazy:
+// Los navegadores no permiten reproducir audio hasta que el usuario interactúa.
+// Ponemos un listener global para iniciar el motor de audio al primer clic en cualquier lado.
 document.addEventListener('click', () => {
     if (!audioContext) initAudio();
 }, { once: true });

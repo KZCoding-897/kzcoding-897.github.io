@@ -18,12 +18,28 @@ body {
 .key{
     height: calc(var(--width)*4);
     width: var(--width);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+}
+
+.note-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    user-select: none;
 }
 
 .white{
     --width: 100px;
     background-color: white;
     border: 1px solid #333;
+}
+
+.white .note-label {
+    color: #333;
 }
 
 .white.active {
@@ -36,6 +52,14 @@ body {
     margin-left: calc(var(--width)/-2);
     margin-right: calc(var(--width)/-2);
     z-index: 2;
+}
+
+.black .note-label {
+    color: white;
+}
+
+.black.active {
+    background-color: #333;
 }
 
 .black.active {
